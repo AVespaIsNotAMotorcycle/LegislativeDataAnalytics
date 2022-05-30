@@ -9,6 +9,7 @@ API:
  http://206.81.7.63:5000
  
 Webpage: 
-  http://csci499lda.com/
+  http://csci499lda.com/ (down rn)
+  http://206.81.7.63:3001/
   
  For more precise information about our API and Webpage, please visit their accompanying READMEs, located in their respective directories.
