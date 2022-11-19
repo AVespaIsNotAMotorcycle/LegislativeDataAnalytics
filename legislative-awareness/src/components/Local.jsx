@@ -1,8 +1,6 @@
 import { Component } from "react";
 import axios from "axios";
-// import "./style.css";
 import { SocialIcon } from "react-social-icons";
-// import Navigation from "./Navigation";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
@@ -54,8 +52,8 @@ class Local extends Component {
     } catch (error) {
       if (error.response) {
         this.setState({ found: false });
-        console.log(`Error: Not Found - ${error.response.data}`); // Not Found
-        console.log(`Error: ${error.response.status}`); // 404
+        console.error(`Error: Not Found - ${error.response.data}`); // Not Found
+        console.error(`Error: ${error.response.status}`); // 404
       }
     }
   };
@@ -75,8 +73,8 @@ class Local extends Component {
     } catch (error) {
       if (error.response) {
         this.setState({ found: false });
-        console.log(`Error: Not Found - ${error.response.data}`); // Not Found
-        console.log(`Error: ${error.response.status}`); // 404
+        console.error(`Error: Not Found - ${error.response.data}`); // Not Found
+        console.error(`Error: ${error.response.status}`); // 404
       }
     }
   };
