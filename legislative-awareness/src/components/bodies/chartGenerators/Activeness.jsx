@@ -1,17 +1,17 @@
 import React from "react";
-import Chart from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 import Typography from "@mui/material/Typography";
 
 export default class Activeness extends React.Component {
   // SO: questions/25594478/different-color-for-each-bar-in-a-bar-chart-chartjs
-  randomColor = () => {
-    let letters = '0123456789ABCDEF'.split('');
+  static randomColor = () => {
+    const letters = '0123456789ABCDEF'.split('');
     let color = '#';
-    for (let i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
+    for (let i = 0; i < 6; i += 1) {
+      color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
-  }
+  };
 
   render() {
     const months = [
@@ -497,9 +497,7 @@ export default class Activeness extends React.Component {
             plugins: {
               title: {
                 display: false,
-                text: (ctx) =>
-                  "Representative Activeness by Month" +
-                  ctx.chart.options.scales.y.stacked,
+                text: (ctx) => "Representative Activeness by Month".concat(ctx.chart.options.scales.y.stacked),
               },
               legend: {
                 display: true,

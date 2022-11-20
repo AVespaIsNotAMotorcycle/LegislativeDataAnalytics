@@ -1,30 +1,33 @@
-import React from "react";
-import axios from "axios";
-import { Bar } from "react-chartjs-2";
-import Calendar from "./Calendar";
-import Typography from "@mui/material/Typography";
+import React from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
+import { Bar } from 'react-chartjs-2';
+import Typography from '@mui/material/Typography';
+import Calendar from './Calendar';
 
 export default class Bills extends React.Component {
-  API_URL = "http://206.81.7.63:5000/graph-apis/state-representative-bills/assembly";
+  API_URL = 'http://206.81.7.63:5000/graph-apis/state-representative-bills/assembly';
+
   constructor(props) {
     super(props);
     this.state = {
       apiData: {},
       reps: [],
       votes: [],
-      found: false,
       startDate: null,
       endDate: null,
     };
   }
 
-  componentDidMount = async () => {
+  async componentDidMount() {
     await this.fetchData();
-  };
+  }
 
   getApiUrl = (start, end) => {
-    start = this.state.startDate || "2021-01-01";
-    end = this.state.endDate || new Date().toISOString().slice(0, 10);
+    let { startDate } = this.state;
+    let { endDate } = this.state;
+    if (!startDate) { startDate = '2021-01-01'; }
+    if (!endDate) { endDate = new Date().toISOString().slice(0, 10); }
     if (!start && !end) {
       return this.API_URL;
     }
@@ -34,12 +37,11 @@ export default class Bills extends React.Component {
   fetchData = async () => {
     const url = this.getApiUrl(this.state.startDate, this.state.endDate);
     try {
-      let response = await axios.get(url);
-      this.setState({ apiData: response.data, found: true });
+      const response = await axios.get(url);
+      this.setState({ apiData: response.data });
       this.handleData();
     } catch (error) {
       if (error.response) {
-        this.setState({ found: false });
         console.error(`Error: Not Found - ${error.response.data}`); // Not Found
         console.error(`Error: ${error.response.status}`); // 404
       }
@@ -47,8 +49,8 @@ export default class Bills extends React.Component {
   };
 
   handleData = () => {
-    let reps = [],
-      votes = [];
+    const reps = [];
+    const votes = [];
 
     this.state.apiData.forEach((obj) => {
       reps.push(obj.sponsor);
@@ -70,9 +72,9 @@ export default class Bills extends React.Component {
 
   render() {
     return (
-      <div className="full">
-        <div className="centered-display">
-          <Typography variant="h6" component="div" gutterBottom>
+      <div className='full'>
+        <div className='centered-display'>
+          <Typography variant='h6' component='div' gutterBottom>
             Select a range of dates to preview data
           </Typography>
           <Calendar from={this.handleFromDate} to={this.handleToDate} />
@@ -82,16 +84,16 @@ export default class Bills extends React.Component {
             labels: this.state.reps,
             datasets: [
               {
-                label: "# of Bills Voted On",
-                backgroundColor: "rgba(138, 182, 169, 0.5)",
-                borderColor: "rgba(0,0,0,1)",
+                label: '# of Bills Voted On',
+                backgroundColor: 'rgba(138, 182, 169, 0.5)',
+                borderColor: 'rgba(0,0,0,1)',
                 borderWidth: 1,
                 data: this.state.votes,
               },
             ],
           }}
           options={{
-            indexAxis: "x",
+            indexAxis: 'x',
             elements: {
               bar: {
                 borderWidth: 2,
@@ -100,37 +102,32 @@ export default class Bills extends React.Component {
             responsive: true,
             plugins: {
               legend: {
-                position: "right",
+                position: 'right',
               },
               title: {
                 display: true,
-                text: "Representatives and Number of Bills Put Forward",
+                text: 'Representatives and Number of Bills Put Forward',
               },
             },
-            events: ["click", "mousemove"],
+            events: ['click', 'mousemove'],
             onHover: (event, item) => {
               if (item.length === 0) return;
-
-              
             },
             onClick: (event, item) => {
               if (item.length === 0) return; // <--- If the item is canvas and not a bar, dip
+              const idx = item[0].index;
+              const label = event.chart.config.config.data.labels[idx];
 
-              var idx = item[0].index;
-              // var value =
-              //   event.chart.config._config.data.datasets[0].data[
-              //     idx
-              //   ];
-              var label =
-                event.chart.config._config.data.labels[idx];
-
-              // console.log(`Label: ${label}, Value: ${value}, Index: ${idx}`)
               this.props.clickedLabel(label);
             },
           }}
         />
-        <button className="smolButton" onClick={this.fetchData}>Reset</button>
+        <button className="smolButton" type="button" onClick={this.fetchData}>Reset</button>
       </div>
     );
   }
 }
+
+Bills.propTypes = {
+  clickedLabel: PropTypes.func.isRequired,
+};

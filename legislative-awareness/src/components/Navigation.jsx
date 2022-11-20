@@ -1,5 +1,11 @@
-import React from "react";
-import { Link, withRouter } from "react-router-dom";
+import React from 'react';
+import PropTypes from 'prop-types';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
 function Navigation(props) {
   return (
@@ -10,7 +16,7 @@ function Navigation(props) {
             <h3>Legislative Awareness</h3>
           </Link>
 
-          {/* Code taken from technomoro*/}
+          {/* Code taken from technomoro */}
           <div>
             <ul className="navbar-nav ml-auto">
               <li
@@ -57,6 +63,26 @@ function Navigation(props) {
   );
 }
 
-var NavigationBar = withRouter(Navigation)
+function withRouter(Component) {
+  function ComponentWithRouterProp(props) {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const params = useParams();
+    return (
+      <Component
+        {...props}
+        router={{ location, navigate, params }}
+      />
+    );
+  }
+
+  return ComponentWithRouterProp;
+}
+
+const NavigationBar = withRouter(Navigation);
 
 export default NavigationBar;
+
+Navigation.propTypes = {
+  location: PropTypes.instanceOf(Object).isRequired,
+};

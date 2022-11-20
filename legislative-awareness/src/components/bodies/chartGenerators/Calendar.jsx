@@ -1,11 +1,11 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import moment from "moment";
 import Helmet from "react-helmet";
 
-import DayPickerInput from "react-day-picker/DayPickerInput";
-import "react-day-picker/lib/style.css";
-
-import { formatDate, parseDate } from "react-day-picker/moment";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { format } from 'date-fns';
 
 export default class Calendar extends React.Component {
   constructor(props) {
@@ -18,6 +18,16 @@ export default class Calendar extends React.Component {
     };
   }
 
+  handleFromChange(from) {
+    this.setState({ from });
+    this.props.from(format(from, "YYYY-MM-DD"));
+  }
+
+  handleToChange(to) {
+    this.setState({ to }, this.showFromMonth);
+    this.props.to(format(to, "YYYY-MM-DD"));
+  }
+
   showFromMonth() {
     const { from, to } = this.state;
     if (!from) {
@@ -28,27 +38,15 @@ export default class Calendar extends React.Component {
     }
   }
 
-  handleFromChange(from) {
-    this.setState({ from });
-    this.props.from(formatDate(from, "YYYY-MM-DD"));
-  }
-
-  handleToChange(to) {
-    this.setState({ to }, this.showFromMonth);
-    this.props.to(formatDate(to, "YYYY-MM-DD"));
-  }
-
   render() {
     const { from, to } = this.state;
     const modifiers = { start: from, end: to };
     return (
       <div className="InputFromTo">
-        <DayPickerInput
+        <DayPicker
           value={from}
           placeholder="From (Month Day, Year)"
           format="LL"
-          formatDate={formatDate}
-          parseDate={parseDate}
           dayPickerProps={{
             selectedDays: [from, { from, to }],
             disabledDays: { after: to },
@@ -58,16 +56,16 @@ export default class Calendar extends React.Component {
             onDayClick: () => this.to.getInput().focus(),
           }}
           onDayChange={this.handleFromChange}
-        />{" "}
-        —{" "}
+        />
+        {" "}
+        —
+        {" "}
         <span className="InputFromTo-to">
-          <DayPickerInput
-            ref={(el) => (this.to = el)}
+          <DayPicker
+            ref={(el) => { this.setState({ to: el }); }}
             value={to}
             placeholder="To (Month Day, Year)"
             format="LL"
-            formatDate={formatDate}
-            parseDate={parseDate}
             dayPickerProps={{
               selectedDays: [from, { from, to }],
               disabledDays: { before: from },
@@ -80,7 +78,8 @@ export default class Calendar extends React.Component {
           />
         </span>
         <Helmet>
-          <style>{`
+          <style>
+            {`
   .InputFromTo .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
     background-color: #f0f8ff !important;
     color: #4a90e2;
@@ -102,9 +101,15 @@ export default class Calendar extends React.Component {
   .InputFromTo-to .DayPickerInput-Overlay {
     margin-left: -198px;
   }
-`}</style>
+`}
+          </style>
         </Helmet>
       </div>
     );
   }
 }
+
+Calendar.propTypes = {
+  from: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
+};

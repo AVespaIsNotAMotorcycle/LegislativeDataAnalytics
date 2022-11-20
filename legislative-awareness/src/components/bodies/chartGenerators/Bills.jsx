@@ -1,34 +1,38 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
-import Calendar from "./Calendar";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Calendar from "./Calendar";
 
 export default class Bills extends React.Component {
   API_URL = "http://206.81.7.63:5000/graph-apis/representative-bills";
+
   REP = "";
+	
   VALUE = -1;
+
   constructor(props) {
     super(props);
     this.state = {
       apiData: {},
       reps: [],
       votes: [],
-      found: false,
       startDate: null,
       endDate: null,
-      deleted: false,
     };
   }
 
-  componentDidMount = async () => {
+  async componentDidMount() {
     await this.fetchData();
-  };
+  }
 
   getApiUrl = (start, end) => {
-    start = this.state.startDate || "2021-01-01";
-    end = this.state.endDate || new Date().toISOString().slice(0, 10);
+    let { startDate } = this.state;
+    let { endDate } = this.state;
+    if (!startDate) { startDate = '2021-01-01'; }
+    if (!endDate) { endDate = new Date().toISOString().slice(0, 10); }
     if (!start && !end) {
       return this.API_URL;
     }
@@ -38,21 +42,19 @@ export default class Bills extends React.Component {
   fetchData = async () => {
     const url = this.getApiUrl(this.state.startDate, this.state.endDate);
     try {
-      let response = await axios.get(url);
-      this.setState({ apiData: response.data, found: true });
+      const response = await axios.get(url);
+      this.setState({ apiData: response.data });
       this.handleData();
     } catch (error) {
       if (error.response) {
-        this.setState({ found: false });
-        console.error(`Error: Not Found - ${error.response.data}`); // Not Found
-        console.error(`Error: ${error.response.status}`); // 404
+        console.log(error.response);
       }
     }
   };
 
   handleData = () => {
-    let reps = [],
-      votes = [];
+    const reps = [];
+    const votes = [];
 
     this.state.apiData.forEach((obj) => {
       reps.push(obj.mattersponsorname);
@@ -73,10 +75,9 @@ export default class Bills extends React.Component {
   };
 
   handleDelete = () => {
-    let reps = [...this.state.reps],
-      votes = [...this.state.votes];
-    const rIndex = reps.indexOf(this.REP),
-      vIndex = votes.indexOf(String(this.VALUE));
+    const { reps, votes } = this.state;
+    const rIndex = reps.indexOf(this.REP);
+    const vIndex = votes.indexOf(String(this.VALUE));
     if (rIndex > -1) {
       reps.splice(rIndex, 1);
       this.REP = null;
@@ -84,7 +85,7 @@ export default class Bills extends React.Component {
     if (vIndex > -1) {
       votes.splice(vIndex, 1);
     }
-    this.setState({ reps, votes, deleted: true });
+    this.setState({ reps, votes });
   };
 
   handleButton = (label, val) => {
@@ -108,7 +109,9 @@ export default class Bills extends React.Component {
             onClick={() => this.handleDelete(this.label, this.VALUE)}
             className="remove-btn"
           >
-            Remove {this.REP}?
+            Remove
+            {this.REP}
+            ?
           </Button>
         )}
         <Bar
@@ -144,9 +147,9 @@ export default class Bills extends React.Component {
             onHover: (event, item) => {
               if (item.length === 0) return;
 
-              var idx = item[0].index;
-              var VALUE = event.chart.config._config.data.datasets[0].data[idx];
-              var label = event.chart.config._config.data.labels[idx];
+              const idx = item[0].index;
+              const VALUE = event.chart.config.config.data.datasets[0].data[idx];
+              const label = event.chart.config.config.data.labels[idx];
               this.handleButton(label, VALUE);
               // FIX: doesn't appear
               // <Tooltip title={"Delete" + label + "?"}>
@@ -157,23 +160,20 @@ export default class Bills extends React.Component {
             },
             onClick: (event, item) => {
               if (item.length === 0) return; // <--- If the item is canvas and not a bar, dip
-
-              var idx = item[0].index;
-              // var VALUE =
-              //   event.chart.config._config.data.datasets[0].data[
-              //     idx
-              //   ];
-              var label = event.chart.config._config.data.labels[idx];
-              // console.log(`Label: ${label}, Value: ${VALUE}, Index: ${idx}`)
-
+              const idx = item[0].index;
+              const label = event.chart.config.config.data.labels[idx];
               this.props.clickedLabel(label);
             },
           }}
         />
-        <button className="smolButton" onClick={this.fetchData}>
+        <button className="smolButton" type="button" onClick={this.fetchData}>
           Reset
         </button>
       </div>
     );
   }
 }
+
+Bills.propTypes = {
+  clickedLabel: PropTypes.func.isRequired,
+};

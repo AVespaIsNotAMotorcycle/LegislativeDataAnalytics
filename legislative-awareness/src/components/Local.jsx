@@ -1,4 +1,4 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import axios from "axios";
 import { SocialIcon } from "react-social-icons";
 import Button from "@mui/material/Button";
@@ -6,14 +6,8 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import PlacesAutocomplete from "react-places-autocomplete";
-import {
-  geocodeByAddress,
-  geocodeByPlaceId,
-  getLatLng,
-} from "react-places-autocomplete";
-import { scrollToTop } from "react-scroll/modules/mixins/animate-scroll";
 
-const ColorButton = styled(Button)(({ theme }) => ({
+const ColorButton = styled(Button)(() => ({
   backgroundColor: "#648a64",
   "&:hover": {
     backgroundColor: "#1b5e20",
@@ -38,57 +32,52 @@ class Local extends Component {
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    let address = this.state.address;
-    let key = "AIzaSyDGm2WMjPhv1Ddn9C3ML24u_HtTcT4l6B4"; // Google Cloud API key
-    let linkToAPI =
-      "https://www.googleapis.com/civicinfo/v2/representatives?key=" +
-      key +
-      "&address=" +
-      address;
+    const { address } = this.state;
+    const key = "AIzaSyDGm2WMjPhv1Ddn9C3ML24u_HtTcT4l6B4"; // Google Cloud API key
+    const linkToAPI = "https://www.googleapis.com/civicinfo/v2/representatives?key=".concat(
+      key,
+      "&address=",
+      address
+    );
 
     try {
-      let response = await axios.get(linkToAPI);
+      const response = await axios.get(linkToAPI);
       this.setState({ apiData: response.data, found: true });
     } catch (error) {
       if (error.response) {
         this.setState({ found: false });
-        console.error(`Error: Not Found - ${error.response.data}`); // Not Found
-        console.error(`Error: ${error.response.status}`); // 404
       }
     }
   };
 
   handleSelect = async () => {
-    let address = this.state.address;
-    let key = "AIzaSyDGm2WMjPhv1Ddn9C3ML24u_HtTcT4l6B4"; // Google Cloud API key
-    let linkToAPI =
-      "https://www.googleapis.com/civicinfo/v2/representatives?key=" +
-      key +
-      "&address=" +
-      address;
+    const { address } = this.state;
+    const key = "AIzaSyDGm2WMjPhv1Ddn9C3ML24u_HtTcT4l6B4"; // Google Cloud API key
+    const linkToAPI = "https://www.googleapis.com/civicinfo/v2/representatives?key=".concat(
+      key,
+      "&address=",
+      address
+    );
 
     try {
-      let response = await axios.get(linkToAPI);
+      const response = await axios.get(linkToAPI);
       this.setState({ apiData: response.data, found: true });
     } catch (error) {
       if (error.response) {
         this.setState({ found: false });
-        console.error(`Error: Not Found - ${error.response.data}`); // Not Found
-        console.error(`Error: ${error.response.status}`); // 404
       }
     }
   };
 
   makeList = () => {
-    let officials = this.state.apiData.officials;
-    let offices = this.state.apiData.offices;
-    let result = [];
+    const { officials, offices } = this.state.apiData;
+    const result = [];
 
     // Combine into one object
-    offices.forEach((obj, index) => {
-      let indices = obj["officialIndices"];
-      indices.forEach((index, idx) => {
-        let temp = {};
+    offices.forEach((obj) => {
+      const indices = obj["officialIndices"];
+      indices.forEach((index) => {
+        const temp = {};
         temp["name"] = officials[index]["name"];
         temp["office"] = obj["name"];
         temp["address"] = officials[index]["address"];
@@ -102,14 +91,13 @@ class Local extends Component {
     });
 
     // Remove president & VP
-    for (let i = 0; i < result.length; ++i) {
+    for (let i = 0; i < result.length + 1; i += 1) {
       if (result[i].office.includes("President")) result.shift();
     }
 
-    let list = result.map((official, index) => {
-      return (
+    const list = result.map((official) => (
         <div className="box">
-          <ul className="" key={index}>
+          <ul className="" key={official.name.toLowerCase().replace(/ /g, '_')}>
             <div className="split">
               <img
                 // className="rep-image"
@@ -118,7 +106,13 @@ class Local extends Component {
               />
               <div className="splitItem">
                 <Typography variant="h4" component="div" gutterBottom>
-                  {official.name} ({official.party && official.party.charAt(0)})
+                  {official.name}
+                  (
+                    {
+                      official.party
+                      && official.party.charAt(0)
+                    }
+                  )
                   <Typography variant="h5" component="div" gutterBottom>
                     {official.office}
                   </Typography>
@@ -128,49 +122,55 @@ class Local extends Component {
             <br></br>
             <Typography variant="body1" component="div" gutterBottom>
               <li>
-                Address:{" "}
-                {official.address &&
-                  official.address.map((address) => (
+                Address:
+                {" "}
+                {official.address && official.address.map((address) => (
                     <span>
-                      {address.line1}, {address.city}, {address.state}{" "}
+                      {address.line1}
+                      ,
+                      {address.city}
+                      ,
+                      {address.state}
+                      {" "}
                       {address.zip}
                     </span>
-                  ))}
+                ))}
               </li>
               <li>
-                Phone:{" "}
-                {official.phones &&
-                  official.phones.map((number) => (
+                Phone:
+                {" "}
+                {official.phones && official.phones.map((number) => (
                     <a href={`tel:${number}`}>{number}</a>
-                  ))}
+                ))}
               </li>
               <li>
-                Website:{" "}
+                Website:
+                {" "}
                 <ul>
-                  {official.urls &&
-                    official.urls.map((website) => (
+                  {official.urls && official.urls.map((website) => (
                       <li>
                         <a href={website}>{website}</a>
                       </li>
-                    ))}
+                  ))}
                 </ul>
               </li>
               <li>
-                Social media:{" "}
+                Social media:
+                {" "}
                 <ul className="social-media">
-                  {official.channels &&
-                    official.channels.map((channel) => (
+                  {official.channels && official.channels.map((channel) => (
                       <li>
                         <SocialIcon
                           url={
-                            "https://" +
-                            channel.type.toString().toLowerCase() +
-                            ".com/" +
-                            channel.id.toString().toLowerCase()
+                            "https://".concat(
+                              channel.type.toString().toLowerCase(),
+                              ".com/",
+                              channel.id.toString().toLowerCase()
+                            )
                           }
                         />
                       </li>
-                    ))}
+                  ))}
                 </ul>
               </li>
             </Typography>
@@ -178,8 +178,7 @@ class Local extends Component {
           <br></br>
           <br></br>
         </div>
-      );
-    });
+    ));
     return list;
   };
 
@@ -266,10 +265,15 @@ class Local extends Component {
                     Your Representatives:
                   </Typography>
                   <Typography variant="body2" component="div" gutterBottom>
-                    Searched address:{" "}
+                    Searched address:
+                    {" "}
                     <strong>
-                      {this.state.apiData.normalizedInput.line1},{" "}
-                      {this.state.apiData.normalizedInput.city},{" "}
+                      {this.state.apiData.normalizedInput.line1}
+                      ,
+                      {" "}
+                      {this.state.apiData.normalizedInput.city}
+                      ,
+                      {" "}
                       {this.state.apiData.normalizedInput.state}
                     </strong>
                     .

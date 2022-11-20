@@ -1,45 +1,43 @@
 import React from "react";
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
-import Calendar from "./Calendar";
 import Typography from "@mui/material/Typography";
+import Calendar from "./Calendar";
 
 export default class Committees extends React.Component {
   API_URL = "http://206.81.7.63:5000/graph-apis/committee-bills";
+
   constructor(props) {
     super(props);
     this.state = {
       apiData: {},
       committees: [],
       votes: [],
-      found: false,
       startDate: null,
       endDate: null,
     };
   }
 
+  async componentDidMount() {
+    await this.fetchData();
+  }
+
   fetchData = async () => {
     const url = this.getApiUrl(this.state.startDate, this.state.endDate);
     try {
-      let response = await axios.get(url);
-      this.setState({ apiData: response.data, found: true });
+      const response = await axios.get(url);
+      this.setState({ apiData: response.data });
       this.parseData();
     } catch (error) {
       if (error.response) {
-        this.setState({ found: false });
-        console.error(`Error: Not Found - ${error.response.data}`); // Not Found
-        console.error(`Error: ${error.response.status}`); // 404
+        console.log(error.response);
       }
     }
   };
 
-  componentDidMount = async () => {
-    await this.fetchData();
-  };
-
   parseData = () => {
-    let committees = [],
-      votes = [];
+    const committees = [];
+    const votes = [];
 
     this.state.apiData.forEach((obj) => {
       committees.push(obj.matterbodyname);
@@ -50,8 +48,10 @@ export default class Committees extends React.Component {
   };
 
   getApiUrl = (start, end) => {
-    start = this.state.startDate || "2021-01-01";
-    end = this.state.endDate || new Date().toISOString().slice(0, 10);
+    let { startDate } = this.state;
+    let { endDate } = this.state;
+    if (!startDate) { startDate = '2021-01-01'; }
+    if (!endDate) { endDate = new Date().toISOString().slice(0, 10); }
     if (!start && !end) {
       return this.API_URL;
     }
@@ -109,19 +109,9 @@ export default class Committees extends React.Component {
               },
             },
             events: ["click", "mousemove"],
-            onClick: (event, item) => {
-              if (item.length === 0) return; // <--- If the item is canvas and not a bar, dip
-
-              var idx = item[0].index;
-              var value = event.chart.config._config.data.datasets[0].data[idx];
-              var label = event.chart.config._config.data.labels[idx];
-
-              // console.log(`Label: ${label}, Value: ${value}, Index: ${idx}`)
-              this.props.clickedLabel(label, value);
-            },
           }}
         />
-        <button className="smolButton" onClick={this.fetchData}>Reset</button>
+        <button className="smolButton" type="button" onClick={this.fetchData}>Reset</button>
       </div>
     );
   }
