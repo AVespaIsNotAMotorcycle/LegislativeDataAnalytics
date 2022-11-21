@@ -7,7 +7,6 @@ import {
   Navigate,
 } from 'react-router-dom';
 import {
-  Navigation,
   Footer,
   Home,
   Local,
@@ -29,18 +28,13 @@ function App() {
           <Route path="/data/CityData" exact component={City} />
           <Route path="/data/AssemblyData" exact component={Assembly} />
           <Route path="/data/SenateData" exact component={Senate} />
-          <>
-            <Navigation />
-            <Route path="/data" exact component={Data} />
-            <Route path="/local-info" exact component={Local} />
-            <Route path="/information" exact component={Information} />
-            <Footer />
-          </>
-          <Route path="*">
-            <Navigate to="/NotFound" />
-          </Route>
+          <Route path="/data" exact component={Data} />
+          <Route path="/local-info" exact component={Local} />
+          <Route path="/information" exact component={Information} />
+          <Route path="*" component={<Navigate to="./NotFound" />} />
         </Switch>
       </Router>
+      <Footer />
     </div>
   );
 }
