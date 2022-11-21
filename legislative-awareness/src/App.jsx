@@ -1,5 +1,6 @@
 import './App.css';
 import React from 'react';
+
 import {
   BrowserRouter as Router,
   Routes as Switch,
@@ -7,7 +8,6 @@ import {
   Navigate,
 } from 'react-router-dom';
 import {
-  Footer,
   Home,
   Local,
   Data,
@@ -20,22 +20,19 @@ import {
 
 function App() {
   return (
-    <div>
-      <Router>
-        <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/NotFound" component={NotFound} />
-          <Route path="/data/CityData" exact component={City} />
-          <Route path="/data/AssemblyData" exact component={Assembly} />
-          <Route path="/data/SenateData" exact component={Senate} />
-          <Route path="/data" exact component={Data} />
-          <Route path="/local-info" exact component={Local} />
-          <Route path="/information" exact component={Information} />
-          <Route path="*" component={<Navigate to="./NotFound" />} />
-        </Switch>
-      </Router>
-      <Footer />
-    </div>
+    <Router>
+      <Switch>
+        <Route path="/" element={<Home />} />
+        <Route path="/NotFound" element={<NotFound />} />
+        <Route path="/data/CityData" exact element={<City />} />
+        <Route path="/data/AssemblyData" exact element={<Assembly />} />
+        <Route path="/data/SenateData" exact element={<Senate />} />
+        <Route path="/data" exact element={<Data />} />
+        <Route path="/local-info" exact element={<Local />} />
+        <Route path="/information" exact element={<Information />} />
+        <Route path="*" element={<Navigate to="./NotFound" />} />
+      </Switch>
+    </Router>
   );
 }
 
