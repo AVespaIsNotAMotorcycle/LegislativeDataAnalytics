@@ -4,7 +4,7 @@ dev_env: FORCE
 	npm install
 
 tests: FORCE
-	npm run test:run
+	npm run test
 
 github_staging:
 	-git commit -a
