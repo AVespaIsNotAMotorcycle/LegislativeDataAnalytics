@@ -1,6 +1,6 @@
-const app = require('./server');
 const supertest = require('supertest');
 const http = require('http');
+const app = require('./server');
 
 const apptest = supertest(http.createServer(app));
 
